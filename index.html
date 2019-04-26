@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Train Scheduler</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
+<!--<script src="https://www.gstatic.com/firebasejs/5.9.3/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.10.0/firebase-app.js"></script>-->
+
+  <!-- Add Firebase products that you want to use -->
+  <!--<script src="https://www.gstatic.com/firebasejs/5.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.10.0/firebase-database.js"></script>-->
+<!-- Added Moment JS -->
+<script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+	<div class="row">
+		<h1>Train Schedule</h1>
+	</div>
+	<div class="row">
+		<div class="col-lg-8">
+			<div class="panel panel-success">
+				<div class="panel-heading"> Train Schedule</div>
+				<div class="panel-body">
+					<div class="table-responsive">
+						<table id="trainSchedule" class="table table-striped table-bordered table-hover">
+							<thead>
+								<tr>
+									<th>Train</th>
+									<th>Destination</th>
+									<th>Frequency</th>
+									<th>Next Arrival Time</th>
+									<th>Minutes until Arrival</th>
+								</tr>
+							</thead>
+							<tbody id="trainSchedule">
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-4">
+			<div class="panel panel-info">
+				<div class="panel-heading">Add A Train </div>
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<label for="trainNameInput">Name of Train</label>
+							<input type="text" class="form-control" id="trainNameInput" placeholder="Train">
+						</div>
+						<div class="form-group">
+							<label for="destinationInput">Destination</label>
+							<input type="text" class="form-control" id="destinationInput" placeholder="City">
+						</div>
+						<div class="form-group">
+							<label for="trainTimeInput">First Train Arrival</label>
+							<input type="time" class="form-control" id="trainTimeInput" placeholder="HH:mm">
+						</div>
+						<div class="form-group">
+							<label for="trainFreqInput">Frequency of Train (minutes)</label>
+							<input type="number" class="form-control" id="trainFreqInput" placeholder="20">
+						</div>
+						<button type="submit" class="btn btn-primary" id="addTrain">Add Train</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--<button onclick="googleLogin()">
+
+		Login with Google
+
+</button>-->
+<!-- Script --> 
+
+
+<script>
+
+//document.addEventListener("DOMContentLoaded", event => {
+
+	//	const app = firebase.app();
+	//	console.log(app)
+
+
+//});
+
+//function googleLogin() {
+	//const provider = new firebase.auth.GoogleAuthProvider();
+
+	//firebase.auth().signInWithPopup(provider)
+
+		//	.then(result => {
+			//	const user = result.user;
+				//document.write('Hello ${user.displayName}');
+			//	console.log()
+			//})
+			//.catch(console.log)
+
+
+//}
+			
+
+  // Initialize Firebase
+  var config = {
+   apiKey: "AIzaSyAAHlQCQ4wZDu7z4ZcUDkb28xo0ECFg3tQ",
+   authDomain: "kutrainscheduler-fd74f.firebaseapp.com",
+   databaseURL: "https://kutrainscheduler-fd74f.firebaseio.com",
+   //projectId: "kutrainscheduler-fd74f",
+		storageBucket: "kutrainscheduler-fd74f.appspot.com",
+   //messagingSenderId: "1062904813081"
+  };
+  
+ // var config = {
+ //   apiKey: "AIzaSyClxQ1guZUBycJER2fMUMY1mxWlTTeS2sQ",
+ //   authDomain: "trainschedulerx.firebaseapp.com",
+ //   databaseURL: "https://trainschedulerx.firebaseio.com",
+ //   projectId: "trainschedulerx",
+ //   storageBucket: "trainschedulerx.appspot.com",
+ //   messagingSenderId: "241541043495"
+ // };
+  
+
+
+firebase.initializeApp(config);
+var trainDatabase = firebase.database();
+
+$("#addTrain").on("click", function(event) {
+  event.preventDefault();
+  //  user input variables
+  var trainName = $("#trainNameInput").val().trim();
+  var destination = $("#destinationInput").val().trim();
+  var firstTimeArrival = $("#trainTimeInput").val().trim();  //check this
+  var interval = $("#trainFreqInput").val().trim();
+
+	// Creates local "temporary" object for holding train data
+
+
+  var newTrain = {
+    trainName: trainName,
+    destination: destination,
+    trainStart: firstTimeArrival,
+    trainFrequency: interval
+  };
+ console.log(newTrain);
+  trainDatabase.ref().push(newTrain); // Uploads train data to the database
+
+  console.log(newTrain.trainName);
+  console.log(newTrain.destination);
+  console.log(newTrain.trainStart);
+  console.log(newTrain.trainFrequency);
+
+  alert("Train Schedule successfully added");
+  // Clears all of the text-boxes
+  $("#trainNameInput").val("");
+  $("#destinationInput").val("");
+  $("#trainTimeInput").val("");
+  $("#trainFreqInput").val("");
+});
+
+// 3. Create Firebase event for adding train schedules after user entry
+trainDatabase.ref().on("child_added", function(childSnapshot) {
+	console.log("from the database")
+  console.log(childSnapshot.val());
+  // Pull from database
+  	var trainName = childSnapshot.val().trainName;
+  	var destination = childSnapshot.val().destination;
+  	var trainStart = childSnapshot.val().trainStart;
+  	var trainFrequency = childSnapshot.val().trainFrequency;
+
+  // Train  console log
+  console.log(trainName);
+  console.log(destination);
+  console.log(trainStart);
+  console.log(trainFrequency);
+
+                          
+	
+	//var trainFrequency = 3;
+	//var firstTimeArrival = "03:30";
+	var formatTrainStart = moment(trainStart, "HH:mm").subtract(1, "years");  // Train Start (pushed back 1 year to make sure it comes before current time)
+        	console.log(formatTrainStart);
+	var currentTime = moment();
+        		console.log("Now: " + moment(currentTime).format("hh:mm"));
+  	var timeDiff = moment().diff(moment(formatTrainStart), "minutes");
+        console.log("Time Diff: " + timeDiff);
+        // Time apart (remainder)
+   	var tRemainder = timeDiff % trainFrequency;
+        console.log(tRemainder);
+        // Minute Until Train
+   	var minutesAway = trainFrequency - tRemainder;
+        console.log("min until arrival: " + minutesAway);
+        // Next Train
+    var nextTrain = moment().add(minutesAway, "minutes");
+        console.log("arrival Time: " + moment(nextTrain).format("hh:mm"));  // Create the new row
+
+	var arrivalTime = minutesAway + currentTime;
+		
+	var newRow = $("<tr>").append(
+		$("<td>").text(trainName),
+		$("<td>").text(destination),
+		$("<td>").text(formatTrainStart),
+		$("<td>").text(trainFrequency),
+		$("<td>").text(nextTrain),
+		$("<td>").text(minutesAway)
+	);
+ $("#trainSchedule > tbody").append(newRow);
+ console.log(newRow);
+});
+
+    </script>
+</body>
+</html>
