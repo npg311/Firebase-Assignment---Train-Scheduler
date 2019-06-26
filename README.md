@@ -7,14 +7,6 @@ In this assignment, you'll create a train schedule application that incorporates
 
 - - -
 
-### Setup
-
-* We'll leave that up to you -- however you like. Just make sure you're using Firebase to store data, GitHub to backup your project, and GitHub Pages to host your finished site.
-
-### Submission on BCS
-
-* Please submit both the deployed Github.io link to your homework AND the link to the Github Repository!
-
 ### Instructions
 
 * Make sure that your app suits this basic spec:
@@ -33,4 +25,4 @@ In this assignment, you'll create a train schedule application that incorporates
   
   * Users from many different machines must be able to view same train times.
   
-  * Styling and theme are completely up to you. Get Creative!
+ 
